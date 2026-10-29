@@ -1,0 +1,75 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="save()"
+  novalidate
+  class="flex max-h-[calc(100vh-2rem)] w-[min(32rem,calc(100vw-2rem))] flex-col rounded-2xl bg-white shadow-xl"
+  aria-labelledby="card-dialog-title"
+>
+  <header class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+    <h2 id="card-dialog-title" class="text-lg font-semibold">{{ isEdit ? 'Edit task' : 'New task' }}</h2>
+    <button type="button" (click)="cancel()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600" aria-label="Close">
+      ✕
+    </button>
+  </header>
+
+  <div class="space-y-4 overflow-y-auto px-6 py-5">
+    <label class="block">
+      <span class="field-label">Title</span>
+      <input formControlName="title" class="field" placeholder="What needs to be done?" />
+      @if (form.controls.title.touched && form.controls.title.hasError('required')) {
+        <span class="mt-1 block text-sm text-rose-600">Title is required</span>
+      }
+    </label>
+
+    <label class="block">
+      <span class="field-label">Description</span>
+      <textarea formControlName="description" rows="3" class="field resize-y" placeholder="Add more detail (optional)"></textarea>
+    </label>
+
+    <fieldset>
+      <legend class="field-label">Priority</legend>
+      <div class="flex gap-2">
+        @for (p of priorities; track p) {
+          <label
+            class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition
+              has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-700 border-slate-200 hover:border-slate-300"
+          >
+            <input type="radio" formControlName="priority" [value]="p" class="sr-only" />
+            <span class="size-2.5 rounded-full" [class]="priorityClasses[p]"></span>
+            {{ priorityLabels[p] }}
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="block">
+        <span class="field-label">Due date</span>
+        <input type="date" formControlName="dueDate" class="field" />
+      </label>
+
+      <label class="block">
+        <span class="field-label">Status</span>
+        <select formControlName="columnId" class="field">
+          @for (column of data.columns; track column.id) {
+            <option [value]="column.id">{{ column.title }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <label class="block">
+      <span class="field-label">Labels</span>
+      <input formControlName="labels" class="field" placeholder="bug, frontend" />
+      <span class="mt-1 block text-xs text-slate-500">Separate with commas · up to 5</span>
+    </label>
+  </div>
+
+  <footer class="flex items-center gap-2 border-t border-slate-200 px-6 py-4">
+    @if (isEdit) {
+      <button type="button" class="btn-ghost-danger mr-auto" (click)="remove()">Delete</button>
+    }
+    <button type="button" class="btn-secondary ml-auto" (click)="cancel()">Cancel</button>
+    <button type="submit" class="btn-primary">{{ isEdit ? 'Save' : 'Add task' }}</button>
+  </footer>
+</form>

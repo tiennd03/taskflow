@@ -1,0 +1,101 @@
+@let col = column();
+<section class="flex max-h-full w-72 shrink-0 flex-col rounded-2xl bg-slate-100/80 sm:w-80" [attr.aria-label]="col.title + ' column'">
+  <header class="flex items-center gap-2 px-3 pb-2 pt-3">
+    @if (renaming()) {
+      <input
+        #renameInput
+        [value]="col.title"
+        (keydown.enter)="finishRename(renameInput.value)"
+        (keydown.escape)="renaming.set(false)"
+        (blur)="finishRename(renameInput.value)"
+        maxlength="40"
+        class="field flex-1 py-1 text-sm font-semibold"
+        aria-label="Column name"
+        appAutofocus
+      />
+    } @else {
+      <h2 class="flex-1 truncate">
+        <button
+          type="button"
+          class="max-w-full truncate rounded px-1 text-left text-sm font-semibold hover:bg-slate-200"
+          title="Click to rename"
+          (click)="renaming.set(true)"
+        >
+          {{ col.title }}
+        </button>
+      </h2>
+    }
+
+    <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium tabular-nums text-slate-600">
+      @if (store.isFiltering()) {
+        {{ col.cards.length }}/{{ col.totalCount }}
+      } @else {
+        {{ col.totalCount }}
+      }
+    </span>
+
+    <button
+      type="button"
+      class="rounded-lg p-1 text-slate-400 hover:bg-slate-200 hover:text-rose-600"
+      [attr.aria-label]="'Delete column ' + col.title"
+      title="Delete column"
+      (click)="deleteColumn.emit(col)"
+    >
+      🗑
+    </button>
+  </header>
+
+  <!--
+    cdkDropList: this area accepts dropped cards. [cdkDropListData] tells drop() which column it is.
+    Lists are connected to each other by cdkDropListGroup on the board.
+    Dragging is turned off while filtering, because the visible positions no longer match the real order.
+  -->
+  <div
+    cdkDropList
+    [cdkDropListData]="col.id"
+    [cdkDropListDisabled]="store.isFiltering()"
+    (cdkDropListDropped)="drop($event)"
+    class="flex min-h-16 flex-1 flex-col gap-2 overflow-y-auto px-3 pb-2"
+  >
+    @for (card of col.cards; track card.id) {
+      <div cdkDrag [cdkDragData]="card.id" class="cursor-grab active:cursor-grabbing">
+        <app-card [card]="card" [done]="isDone()" (open)="openCard.emit({ cardId: card.id, columnId: col.id })" />
+        <div *cdkDragPlaceholder class="h-16 rounded-xl border-2 border-dashed border-indigo-300 bg-indigo-50"></div>
+      </div>
+    } @empty {
+      <p class="rounded-xl border-2 border-dashed border-slate-200 py-6 text-center text-sm text-slate-400">
+        {{ store.isFiltering() && col.totalCount > 0 ? 'No matching tasks' : 'Drop tasks here' }}
+      </p>
+    }
+  </div>
+
+  <footer class="px-3 pb-3">
+    @if (adding()) {
+      <textarea
+        #addInput
+        appAutofocus
+        rows="2"
+        maxlength="120"
+        placeholder="Task title — Enter to add, Esc to close"
+        class="field resize-none text-sm"
+        (keydown.enter)="quickAdd(addInput, $event)"
+        (keydown.escape)="adding.set(false)"
+      ></textarea>
+      <div class="mt-2 flex gap-2">
+        <button type="button" class="btn-primary py-1.5 text-sm" (click)="quickAdd(addInput)">Add</button>
+        <button type="button" class="btn-secondary py-1.5 text-sm" (click)="adding.set(false)">Cancel</button>
+        <button type="button" class="ml-auto text-sm text-indigo-600 hover:underline" (click)="newCard.emit(col.id)">
+          More details…
+        </button>
+      </div>
+    } @else {
+      <button
+        type="button"
+        class="w-full rounded-xl px-2 py-1.5 text-left text-sm font-medium text-slate-500 hover:bg-slate-200 hover:text-slate-700"
+        (click)="adding.set(true)"
+      >
+        + Add task
+      </button>
+    }
+  </footer>
+</section>
