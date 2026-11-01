@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "tiennd-taskflow",
     "public": "dist/taskflow/browser",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [{ "source": "**", "destination": "/index.html" }]
