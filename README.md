@@ -4,7 +4,7 @@ A Kanban board for organising tasks: drag cards between columns, edit details in
 
 Built with **Angular 20**, **Angular CDK** (drag & drop, dialog), **NgRx SignalStore** and **Tailwind CSS 4**. Business logic is covered by unit tests that run in CI.
 
-> **Live demo:** _add your deployed URL here_
+> **Live demo:** [https://tiennd-taskflow.web.app](https://tiennd-taskflow.web.app)
 
 <!-- Screenshots: docs/screenshots/board.png, dialog.png, filter.png -->
 
